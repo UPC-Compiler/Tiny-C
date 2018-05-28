@@ -1,0 +1,14 @@
+int main()
+{
+    int a=1,b=2;
+    if(a==1)
+    {
+        write(a);
+        printf("\n");
+    }
+    else
+    {
+        write(b);
+        printf("\n");
+    }
+}

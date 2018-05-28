@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>The Aviator: The Game | Codrops</title>
+		<meta name="description" content="Demo of the game: The Making of 'The Aviator': Animating a Basic 3D Scene with Three.js" />
+		<meta name="keywords" content="three.js, webgl, tutorial, game, 3d, animation, airplane, web development, javascript" />
+		<meta name="author" content="Karim Maaloul for Codrops" />
+		<link rel="shortcut icon" href="favicon.ico">
+		<link href='https://fonts.googleapis.com/css?family=Playfair+Display:400,700,700italic' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="css/demo.css" />
+		<link rel="stylesheet" type="text/css" href="css/game.css" />
+		<script type="text/javascript" src="js/TweenMax.min.js"></script>
+		<script type="text/javascript" src="js/three.min.js"></script>
+		<script type="text/javascript" src="js/game.js" /></script>
+		<!--[if IE]>
+		  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+		<div id="drag-bar" style="-webkit-app-region: drag;position: fixed; top: 0;height: 30px;width:100%;background: #000;"></div>
+		<div class="game-holder" id="gameHolder">
+			<div class="header">
+				<h1><span>the</span>Aviator</h1>
+				<h2>fly it to the end</h2>
+				<div class="score" id="score">
+					<div class="score__content" id="level">
+						<div class="score__label">level</div>
+						<div class="score__value score__value--level" id="levelValue">1</div>
+						<svg class="level-circle" id="levelCircle" viewbox="0 0 200 200">
+							<circle id="levelCircleBgr" r="80" cx="100" cy="100" fill="none" stroke="#d1b790" stroke-width="24px" />
+							<circle id="levelCircleStroke" r="80" cx="100" cy="100" fill="none" #f25346 stroke="#68c3c0" stroke-width="14px" stroke-dasharray="502" />
+						</svg>
+					</div>
+					<div class="score__content" id="dist">
+						<div class="score__label">distance</div>
+						<div class="score__value score__value--dist" id="distValue">000</div>
+					</div>
+					<div class="score__content" id="energy">
+						<div class="score__label">energy</div>
+						<div class="score__value score__value--energy" id="energyValue">
+							<div class="energy-bar" id="energyBar"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="world" id="world"></div>
+			<div class="message message--replay" id="replayMessage">Click to Replay</div>
+			<div class="message message--instructions" id="instructions">Grab the blue pills<span>avoid the red ones</span></div>
+		</div>
+		<!-- Demo links -->
+		<!-- <nav class="meta">
+			<a class="codrops-icon codrops-icon--prev" href="http://tympanus.net/Development/Interactive3DMallMap/" title="Previous Demo"><span>Previous Demo</span></a>
+			<a class="codrops-icon codrops-icon--drop" href="http://tympanus.net/codrops/?p=26501" title="Back to the article"><span>Back to the Codrops article</span></a>
+			<a class="demo-link" href="part1.html">Part 1</a>
+			<a class="demo-link" href="part2.html">Part 2</a>
+		</nav> -->
+		<div class="partisan">
+			<svg class="partisan__bg" viewBox="0 0 500 188" preserveAspectRatio="none" width="100%" height="100%" aria-hidden="true">
+				<polygon points="0 154 123.39 0 235.78 14.79 365.6 28.9 436.24 114.93 500 188 0 188 0 154" fill="#bed730"/>
+				<polygon points="0 188 108.84 18.17 347.91 26.79 500 188 365.6 28.9 123.39 0 0 154 0 188" fill="#dde465"/>
+			</svg>
+			<div style="font-size: 16px">团队成员: 孙明利 武雷 李冉 郝秋月 王思红</div>
+		</div>
+		<svg t="1526877738147"  onclick="javascript:window.close()" style=" -webkit-app-region: no-drag; z-index: 10;position: fixed; right: 0; top: 0;height: 30px;width: 30px;cursor: pointer;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1914" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><defs><style type="text/css"></style></defs><path d="M512 1024C229.701818 1024 0 794.298182 0 512S229.701818 0 512 0c282.321455 0 512 229.701818 512 512S794.344727 1024 512 1024zM512 44.520727C254.231273 44.520727 44.544 254.208 44.544 512c0 257.768727 209.710545 467.479273 467.479273 467.479273 257.792 0 467.479273-209.733818 467.479273-467.479273C979.502545 254.208 769.792 44.520727 512 44.520727z" p-id="1915" fill="#8a8a8a"></path><path d="M666.693818 692.177455c-5.701818 0-11.403636-2.164364-15.755636-6.493091L342.690909 377.390545c-8.704-8.704-8.704-22.784 0-31.488 8.704-8.704 22.784-8.704 31.488 0L682.426182 654.196364c8.704 8.680727 8.704 22.784 0 31.488C678.097455 690.013091 672.418909 692.177455 666.693818 692.177455z" p-id="1916" fill="#8a8a8a"></path><path d="M354.048 692.200727c-5.701818 0-11.380364-2.187636-15.732364-6.493091-8.704-8.704-8.704-22.784 0-31.488L654.196364 338.338909c8.704-8.704 22.784-8.704 31.488 0 8.680727 8.704 8.680727 22.784 0 31.488L369.803636 685.707636C365.451636 690.013091 359.749818 692.200727 354.048 692.200727z" p-id="1917" fill="#8a8a8a"></path></svg>
+	</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta>
+	<title>编译编辑器</title>
+	<link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+
+	<div id="msg-bar" class="msg-bar"></div>
+	<div id="all-container">
+		<div id="container"></div>
+		<div id="debug-panel-line"></div>
+		<div id="debug-panel">
+			<div id="output-title">
+				<span>输出</span>
+			</div>
+			<pre id="output-panel"></pre>
+		</div>
+	</div>
+
+</body>
+
+<script>
+	// Monaco uses a custom amd loader that overrides node's require.
+	// Keep a reference to node's require so we can restore it after executing the amd loader file.
+	var nodeRequire = global.require;
+</script>
+<script src="./node_modules/monaco-editor/min/vs/loader.js"></script>
+<script>
+	// Save Monaco's amd require and restore Node's require
+	var amdRequire = global.require;
+	global.require = nodeRequire;
+</script>
+
+<script>
+	const { ipcRenderer } = require('electron')
+	const msgBar = require('./render-process/msg-bar')
+
+	ipcRenderer.on('save-sucessfully', (event, msg) => {
+		console.log(msg)
+		msgBar.sucess(msg)
+	})
+	ipcRenderer.on('save-error', (event, msg) => {
+		msgBar.error(msg)
+	})
+	// require node modules before loader.js comes in
+	var path = require('path');
+	function uriFromPath(_path) {
+		var pathName = path.resolve(_path).replace(/\\/g, '/');
+		if (pathName.length > 0 && pathName.charAt(0) !== '/') {
+			pathName = '/' + pathName;
+		}
+		return encodeURI('file://' + pathName);
+	}
+	amdRequire.config({
+		'vs/nls': {
+			availableLanguages: {
+				'*': 'zh-cn'
+			}
+		},
+		baseUrl: uriFromPath(path.join(__dirname, './node_modules/monaco-editor/dev'))
+	});
+	// workaround monaco-css not understanding the environment
+	self.module = undefined;
+	// workaround monaco-typescript not understanding the environment
+	self.process.browser = true;
+	amdRequire(['vs/editor/editor.main'], function () {
+		var editor = monaco.editor.create(document.getElementById('container'), {
+			value: [
+				'int main() {',
+				'\tprintf("Hello World!\\n");',
+				'}'
+			].join('\n'),
+			language: 'c',
+			theme: 'vs-dark',
+			fontSize: 14,
+			automaticLayout: true
+		});
+		console.log(editor)
+		ipcRenderer.on('open-file-data', (event, data) => {
+			editor.setValue(data)
+		})
+		ipcRenderer.on('create-file', (event, data) => {
+			editor.setValue(data)
+		})
+		ipcRenderer.on('to-save-file', (event, data) => {
+			console.log(data)
+			if (!data) {
+				ipcRenderer.send('save-as-file', editor.getValue())
+			} else {
+				ipcRenderer.send('save-file', editor.getValue())
+			}
+		})
+		ipcRenderer.on('to-save-as-file', (event, data) => {
+			ipcRenderer.send('save-as-file', editor.getValue())
+		})
+		ipcRenderer.on('to-get-editor-value', (event, data) => {
+			ipcRenderer.send('get-editor-value', {
+				code : data,
+				data : editor.getValue()
+			})
+		})
+		ipcRenderer.on('editor-undo', (event, data) => {
+			editor.trigger('', 'undo')
+		})
+		ipcRenderer.on('editor-redo', (event, data) => {
+			editor.trigger('', 'redo')
+		})
+	});
+	function outputShowDone(msg) {
+		outPutPanel.style.color = '#00FEB0'
+		switch (msg.code) {
+			case 'lex': msgBar.sucess('词法分析成功'); break;
+			case 'parse': msgBar.sucess('语法分析成功'); break;
+			case 'sem': msgBar.sucess('语义分析成功'); break;
+			case 'asm': msgBar.sucess('生成汇编码成功 ' + msg.path); break;
+			case 'target': msgBar.sucess('生成机器码成功 ' + msg.path); break;
+			case 'run': msgBar.sucess('运行成功'); break;
+		}
+		let tmpMsgData = msg.data
+		tmpMsgData = tmpMsgData.replace(/>/g, "&gt;")
+		tmpMsgData = msg.data.replace(/</g, "&lt;")
+		if (msg.code === 'target' || msg.code === 'asm')
+			outPutPanel.innerHTML = tmpMsgData + '\n文件位置:' + msg.path
+		else
+			outPutPanel.innerHTML = tmpMsgData
+	}
+	function outputShowError(msg) {
+		outPutPanel.style.color = 'red'
+		switch (msg.code) {
+			case 'lex': msgBar.error('词法分析时出现错误'); break;
+			case 'parse': msgBar.error('语法分析时出现错误'); break;
+			case 'sem': msgBar.error('语义分析时出现错误'); break;
+			case 'asm': msgBar.error('生成汇编码时出现错误'); break;
+			case 'target': msgBar.error('生成机器码时出现错误'); break;
+			case 'run': msgBar.error('运行时出现错误'); break;
+		}
+		let tmpMsgData = msg.data
+		tmpMsgData = tmpMsgData.replace(/>/g, "&gt;")
+		tmpMsgData = msg.data.replace(/</g, "&lt;")
+		outPutPanel.innerHTML = tmpMsgData
+	}
+	const outPutPanel = document.getElementById('output-panel')
+	ipcRenderer.on('analysis-done', (event, msg) => { outputShowDone(msg); })
+	ipcRenderer.on('analysis-err', (event, msg) => { outputShowError(msg); })
+</script>
+<script src="renderer.js"></script>
+
+</html>

@@ -1,0 +1,72 @@
+html,body,#all-container{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #1e1e1e;
+}
+::-webkit-scrollbar{
+    height: 50px;
+    width: 10px;
+}
+::-webkit-scrollbar-thumb  
+{   
+    background-color: #555;  
+} 
+#all-container{
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: auto 1px 150px;
+}
+#container{
+    width:100%;
+    overflow: hidden;
+}
+#debug-panel-line{
+    height: 1px;
+    width: 100%;
+}
+#debug-panel-line:hover{
+    cursor: ns-resize;
+}
+#debug-panel{
+    width: 100%;
+    background: #1e1e1e;
+    border-top: 1px rgb(66, 62, 62) solid;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 25px auto;
+}
+#output-title{
+    font-size: 12px;
+    color: #fff;
+}
+#output-title>span{
+    display: inline-block;
+    height: 100%;
+    line-height: 25px;
+    margin-left: 20px;
+    border-bottom: 1px rgb(83, 80, 80) solid;
+}
+.msg-bar{
+    position: fixed;
+    top: 0;
+    height: 22px;
+    line-height: 22px;
+    width: 100%;
+    z-index: 1;
+    transition: .3s all;
+    color: white;
+    text-align: center;
+    transform: translateY(-100%)
+}
+.msg-bar-active{
+    transform: translateY(0)
+}
+#output-panel{
+    overflow-y: scroll;
+    padding: 0 20px 20px 20px;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
