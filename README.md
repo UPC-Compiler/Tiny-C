@@ -1,6 +1,6 @@
 # MiniC Compiler
 > 编译器课程设计 实现C语言编译器的子集,生成 Intelx86 32位汇编,
-[下载](http://baidu.com)
+[下载](https://dev.tencent.com/u/wulei123/p/Tiny-C-bin/git/archive/master)
 ## 功能
 1. 数据类型: void int char
 2. 运算符: 不支持三元表达式，不支持位运算符
